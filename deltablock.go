@@ -500,6 +500,7 @@ func fillBlockToFile(block *[]byte, volDev *os.File, offset int64) error {
 }
 
 func DeleteDeltaBlockBackup(backupURL string) error {
+	logrus.Errorf("enters DeleteDeltaBlockBackup")
 	bsDriver, err := GetBackupStoreDriver(backupURL)
 	if err != nil {
 		return err
@@ -542,14 +543,14 @@ func DeleteDeltaBlockBackup(backupURL string) error {
 		return err
 	}
 	if len(backupNames) == 0 {
-		log.Debugf("No snapshot existed for the volume %v, removing volume", volumeName)
+		log.Errorf("No snapshot existed for the volume %v, removing volume", volumeName)
 		if err := removeVolume(volumeName, bsDriver); err != nil {
-			log.Warningf("Failed to remove volume %v due to: %v", volumeName, err.Error())
+			log.Errorf("Failed to remove volume %v due to: %v", volumeName, err.Error())
 		}
 		return nil
 	}
 
-	log.Debug("GC started")
+	log.Errorf("GC started")
 	for _, backupName := range backupNames {
 		backup, err := loadBackup(backupName, volumeName, bsDriver)
 		if err != nil {
@@ -572,15 +573,15 @@ func DeleteDeltaBlockBackup(backupURL string) error {
 	var blkFileList []string
 	for blk := range discardBlockSet {
 		blkFileList = append(blkFileList, getBlockFilePath(volumeName, blk))
-		log.Debugf("Found unused blocks %v for volume %v", blk, volumeName)
+		log.Errorf("Found unused blocks %v for volume %v", blk, volumeName)
 	}
 	if err := bsDriver.Remove(blkFileList...); err != nil {
 		return err
 	}
-	log.Debug("Removed unused blocks for volume ", volumeName)
+	log.Errorf("Removed unused blocks for volume ", volumeName)
 
-	log.Debug("GC completed")
-	log.Debug("Removed backupstore backup ", backupName)
+	log.Errorf("GC completed")
+	log.Errorf("Removed backupstore backup ", backupName)
 
 	v, err = loadVolume(volumeName, bsDriver)
 	if err != nil {
