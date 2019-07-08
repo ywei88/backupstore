@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/sirupsen/logrus"
 	"github.com/longhorn/backupstore/util"
+	"github.com/sirupsen/logrus"
 
 	. "github.com/longhorn/backupstore/logging"
 )
@@ -83,6 +83,11 @@ func saveConfigInBackupStore(filePath string, driver BackupStoreDriver, v interf
 func volumeExists(volumeName string, driver BackupStoreDriver) bool {
 	volumeFile := getVolumeFilePath(volumeName)
 	return driver.FileExists(volumeFile)
+}
+
+func volumeBlocksExists(volumeName string, driver BackupStoreDriver) bool {
+	volumeBlocks := getBlockPath(volumeName)
+	return driver.FileExists(volumeBlocks)
 }
 
 func getVolumePath(volumeName string) string {

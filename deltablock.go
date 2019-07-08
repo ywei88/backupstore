@@ -500,7 +500,6 @@ func fillBlockToFile(block *[]byte, volDev *os.File, offset int64) error {
 }
 
 func DeleteDeltaBlockBackup(backupURL string) error {
-	logrus.Errorf("enters DeleteDeltaBlockBackup")
 	bsDriver, err := GetBackupStoreDriver(backupURL)
 	if err != nil {
 		return err

@@ -2,6 +2,7 @@ package backupstore
 
 import (
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"net/url"
 
 	"github.com/longhorn/backupstore/util"
@@ -74,11 +75,20 @@ func removeVolume(volumeName string, driver BackupStoreDriver) error {
 	}
 
 	volumeDir := getVolumePath(volumeName)
-	if err := driver.Remove(volumeDir); err != nil {
+	volumeBlocksDirectory := getBlockPath(volumeName)
+	if err := driver.Remove(volumeBlocksDirectory); err != nil {
 		return err
 	}
-	log.Debug("Removed volume directory in backupstore: ", volumeDir)
-	log.Debug("Removed backupstore volume ", volumeName)
+
+	if !volumeBlocksExists(volumeName, driver) {
+		err := driver.Remove(volumeDir)
+		if err != nil {
+			return err
+		}
+	}
+
+	logrus.Errorf("Removed volume directory in backupstore: ", volumeDir)
+	logrus.Errorf("Removed backupstore volume ", volumeName)
 
 	return nil
 }
