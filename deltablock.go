@@ -499,13 +499,8 @@ func fillBlockToFile(block *[]byte, volDev *os.File, offset int64) error {
 	return nil
 }
 
-func DeleteBackupVolume(backupURL string) error {
-	bsDriver, err := GetBackupStoreDriver(backupURL)
-	if err != nil {
-		return err
-	}
-
-	_, volumeName, err := decodeBackupURL(backupURL)
+func DeleteBackupVolume(volumeName string, destURL string) error {
+	bsDriver, err := GetBackupStoreDriver(destURL)
 	if err != nil {
 		return err
 	}

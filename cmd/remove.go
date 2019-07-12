@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/urfave/cli"
 
 	"github.com/longhorn/backupstore"
@@ -43,7 +44,13 @@ func BackupVolumeRemoveCmd() cli.Command {
 		Name:    "removebackupvolume",
 		Aliases: []string{"rmbv"},
 		Usage:   "remove a backup volume in objectstore: rmbv <backupvolume>",
-		Action:  cmdBackupVolumeRemove,
+		Flags: []cli.Flag{
+			cli.StringFlag{
+				Name:  "volume",
+				Usage: "volume name",
+			},
+		},
+		Action: cmdBackupVolumeRemove,
 	}
 }
 
@@ -55,15 +62,18 @@ func cmdBackupVolumeRemove(c *cli.Context) {
 
 func doBackupVolumeRemove(c *cli.Context) error {
 	if c.NArg() == 0 {
-		return RequiredMissingError("backup URL")
+		return RequiredMissingError("dest URL")
 	}
-	backupURL := c.Args()[0]
-	if backupURL == "" {
-		return RequiredMissingError("backup URL")
+	destURL := c.Args()[0]
+	if destURL == "" {
+		return RequiredMissingError("dest URL")
 	}
-	backupURL = util.UnescapeURL(backupURL)
+	volumeName := c.String("volume")
+	if volumeName != "" && !util.ValidateName(volumeName) {
+		return fmt.Errorf("Invalid volume name %v for backup", volumeName)
+	}
 
-	if err := backupstore.DeleteBackupVolume(backupURL); err != nil {
+	if err := backupstore.DeleteBackupVolume(volumeName, destURL); err != nil {
 		return err
 	}
 	return nil
