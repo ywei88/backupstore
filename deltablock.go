@@ -238,6 +238,7 @@ func performIncrementalBackup(config *DeltaBackupConfig, delta *Mappings, deltaB
 	backup.CreatedTime = util.Now()
 	backup.Size = int64(len(backup.Blocks)) * DEFAULT_BLOCK_SIZE
 	backup.Labels = config.Labels
+	backup.Deleting = false
 
 	if err := saveBackup(backup, bsDriver); err != nil {
 		return progress, "", err
@@ -589,6 +590,11 @@ func DeleteDeltaBlockBackup(backupURL string) error {
 	if err != nil {
 		return err
 	}
+	DeletingBackup.Deleting = true
+	if err := saveBackup(DeletingBackup, bsDriver); err != nil {
+		return err
+	}
+
 	discardBlockSet := make(map[string]bool)
 	for _, blk := range DeletingBackup.Blocks {
 		discardBlockSet[blk.BlockChecksum] = true
