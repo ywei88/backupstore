@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/sirupsen/logrus"
 
@@ -564,6 +565,7 @@ func DeleteBackupVolume(volumeName string, destURL string) error {
 	if err != nil {
 		return err
 	}
+	time.Sleep(time.Second * 45)
 	if err := removeVolume(volumeName, bsDriver); err != nil {
 		return err
 	}
